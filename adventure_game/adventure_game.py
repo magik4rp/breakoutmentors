@@ -94,14 +94,14 @@ class Food(Item):
     def eat(self):
         return self.health
 
-home = Place("Home", None, None)
-bus_station = Place("Bus Station", home, None)
-school = Place("Sunny Side High", bus_station, None)
-backyard = Place("Backyard", None, home)
-apple = Food("Apple", home, 10)
-me = Player("Frances", 20, home)
-me.take("Apple")
-me.talk()
+#Make a place called "Home"
+
+#Make a place called "School" and put it on the right of home.
+
+#Make a player for yourself
+
+#make some food at home to eat later
+
 
 running = True
 def parse(string):
