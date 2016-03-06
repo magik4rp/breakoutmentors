@@ -16,6 +16,7 @@ class Item:
         self.name = name
         self.location = location
         self.location.items[name] = self
+        Item.num_items += 1
     def use(self):
         print("Using " + self.name)
         
@@ -33,6 +34,7 @@ class Place:
         if (self.right):
             self.right.left = self
         self.items = {}
+        Place.num_places += 1
     def find(self, item):
         if item in self.items:
             return self.items[item]
