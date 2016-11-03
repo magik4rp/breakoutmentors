@@ -20,7 +20,7 @@ var model = application.behavior = Object.create(Object.prototype, {
 
    onComplete: { value: function(application, message) {
       // After the BLLs have been configured, build the UI and issue single/repeated commands to the BLL
-      application.skin = new Skin({fill: "black"});
+      application.skin = new Skin({fill: "red"});
    }},
    
    onLaunch: { value: function(application) {
