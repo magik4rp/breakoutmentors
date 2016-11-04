@@ -41,3 +41,4 @@ var model = application.behavior = Object.create(Object.prototype, {
 
 
 //hello
+//hello2
