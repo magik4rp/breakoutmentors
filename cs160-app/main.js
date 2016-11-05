@@ -91,3 +91,4 @@ application.behavior = Behavior({
 		mainContainer.add(currentScreen);
 	}	
 });
+
