@@ -21,6 +21,10 @@ let whiteSkin = new Skin({fill: 'white'});
 let graySkin = new Skin({fill: 'black'});
 let redSkin = new Skin({fill: '#E71D32'});
 let greenSkin = new Skin({fill: '#5AA700'});
+var blackBorderedSkin = new Skin({
+    borders: {left: 2, right: 2, top: 2, bottom: 2}, 
+    stroke: "black"
+});
 
 //added a green & red style and changed their sizes! -Stacy
 var blackHeadingStyle = new Style ({ font: '38px Avenir-Heavy', color: 'black', horizontal: 'center'});
@@ -28,14 +32,17 @@ var boldBlackBodyStyle = new Style ({ font: 'bold 20px Avenir-Roman', color: 'bl
 var blackBodyStyle = new Style ({ font: '20px Avenir-Roman', color: 'black', horizontal: 'center'});
 var whiteHeadingStyle = new Style ({ font: '38px Avenir-Heavy', color: 'white', horizontal: 'center'});
 var whiteBodyStyle = new Style ({ font: '20px Avenir-Roman', color: 'white', horizontal: 'center'});
+var whiteSmallStyle = new Style ({ font: '18px Avenir-Roman', color: 'white', horizontal: 'center'});
 var greenBodyStyle = new Style ({ font: 'bold 20px Avenir-Roman', color: '#5AA700', horizontal: 'center'});
 var redBodyStyle = new Style ({ font: 'bold 20px Avenir-Roman', color: '#E71D32', horizontal: 'center'});
 
+/* Data Objects */
+let completedpills = "Sertraline, Vitamin A";
+let incompletepills = "none";
+var refilled = false;
 /*  Templates */
 
 //Home Screen
-let completedpills = "Sertraline, Vitamin A";
-let incompletepills = "none";
 let completedlist = new Column({
 	top: 0, left: 0, right: 0, bottom: 0, skin: whiteSkin,
 	contents: [
@@ -93,7 +100,7 @@ let homeScreen = Column.template($ => ({
 }));
 
 //My Medicine Screen
-let myMedicineScreen = Container.template($ => ({
+let myMedicineScreen = Column.template($ => ({
 	top: 0, left: 0, right: 0, bottom: 0, skin: whiteSkin,
 	contents: [
 	new button({ name: 'medicine-back-button', top: 5, left: 5, 
@@ -101,9 +108,47 @@ let myMedicineScreen = Container.template($ => ({
 			content: new Label({ string: "←", style: blackBodyStyle}),	
 			nextScreen: homeScreen,
 		}),
-	new Label({ string: 'My Medicines', style: blackHeadingStyle }),
-	]
+	new Label({ string: 'My Medicines', style: blackHeadingStyle, top: 25}),
+	new addMedicineButton(),
+
+	],
+	active: true,
+	Behavior: class extends Behavior{
+		onDisplayed(container) {
+			trace('~~~~ LAUNCHED! ~~~~~ \n')
+			var medicines = completedpills.split(/[,]+/);
+			for (var i = 0; i < medicines.length; i++) { 
+				trace(medicines[i] + '\n');
+			    container.insert(
+			    	new button({ name: medicines[i], left: 25, right: 25, top: 10, height: 40,
+					skin: graySkin, 
+						content: new Label({ string: medicines[i], style: whiteBodyStyle }),
+						onTouchBegan: function(container) {container.skin = blackBorderedSkin; container.first.style = blackBodyStyle},
+						nextScreen: individualMedicineScreen,		
+				}), container.last);
+				trace('Added ' + medicines[i] + '\n');
+				trace(container.first.name + '\n');
+			}
+		}
+	}
 }));
+
+let addMedicineButton = Container.template($ => ({
+	height: 40, right: 25, left: 25, top: 10, skin: blackBorderedSkin,
+	contents: [new Label({string: "+ ADD MEDICINE", style: blackBodyStyle})],
+	active: true,
+	Behavior: class extends Behavior{
+		onTouchBegan(container){
+			container.skin = graySkin;
+			container.first.style = whiteBodyStyle;
+		}
+		onTouchEnded(container) {
+			container.skin = blackBorderedSkin;
+			container.first.style = blackBodyStyle;
+		}
+	}
+}));
+
 
 //Individual Medicine Screen
 let pillDetails = new Column({
@@ -120,26 +165,58 @@ let individualMedicineScreen = Column.template($ => ({
 	top: 0, left: 0, right: 0, bottom: 0, skin: whiteSkin,
 	contents: [
 		//editButton not finished yet!
-		new button({ name: 'editButton', top: 0, left: 240, right: 0, bottom: 0,
+		new button({ name: 'medicine-back-button', top: 5, left: 5, 
 			skin: whiteSkin, 
-			content: new Picture({ height: 30, url: "assets/editicon.png" }),	
+			content: new Label({ string: "←", style: blackBodyStyle}),	
+			nextScreen: myMedicineScreen,
 		}),
+		new button({ name: 'editButton', top: -40, left: 280, right: 0, bottom: 0,
+			skin: whiteSkin, 
+			content: new Picture({ height: 15, url: "assets/editicon.png" }),	
+		}),
+		new Label({ string: "Medicine", style: blackHeadingStyle}),
 		pillDetails,
-		new button({ name: "requestRefillButton", top: 100, left: 60, right: 60, bottom: 20,
+		new refillButton({ name: "requestRefillButton", top: 100, left: 60, right: 60, bottom: 20,
 			skin: graySkin,
 			content: new Label({ string: "REQUEST REFILL", style: whiteBodyStyle })
 		}),
 	],
 }));
 
+var timer = 0;
+var up = true;
 //Refill Confirmation
-let refillConfirmation = Container.template($ => ({
-
+let refillConfirmation = Layer.template($ => ({
+	skin: greenSkin, left: 0, right: 0, height: 100, bottom: 0,
+	contents: [new Container({skin: greenSkin, left: 0, right: 0, top: 0, bottom: 0,
+		contents: [new Label({string: "Refill Requested!", style: whiteHeadingStyle})]})],
+	Behavior: class extends Behavior{
+		onCreate(container) {
+			container.opacity = 0;
+			container.interval = 15;
+			container.start();
+		}
+		onTimeChanged(container) {
+			if ((container.opacity < 0.95 ) && up) {
+				container.opacity = container.opacity + 0.05;
+			} 
+			else {
+				up = false;
+				if (timer == 75) {
+					mainContainer.remove(mainContainer.last);
+					up = true;
+					timer = 0;
+				} else {
+					timer += 1;
+				}
+			}
+		}
+	}
 }));
 
 //Lightbox
 let lightbox = Layer.template($ => ({ 
-    top: $.top, height: 300, left: $.left, width: 230,
+    top: $.top, height: 250, left: $.left, width: 230,
     behavior: $.behavior, skin: graySkin, opacity: 0.5,
     contents: [
         $.content
@@ -147,14 +224,14 @@ let lightbox = Layer.template($ => ({
 }));
 
 let lightboxContent = Container.template($ => ({
-	top: 100, left: 100, right: 100, bottom: 100, skin: whiteSkin, 
+	top: 0, left: 0, right: 0, bottom: 0, skin: redSkin, 
 	contents: [
 		$.content
 	]
 }));
 
 let button = Container.template($ => ({
-	top: $.top, bottom: $.bottom, right: $.right, left: $.left,
+	top: $.top, bottom: $.bottom, right: $.right, left: $.left, height: $.height,
 	skin: $.skin, active: true, 
 	contents: [
 		$.content
@@ -170,6 +247,41 @@ let button = Container.template($ => ({
 			trace('added screen \n')
 		}
 	})
+}));
+
+let refillButton = Container.template($ => ({
+	top: $.top, bottom: $.bottom, right: $.right, left: $.left, height: $.height,
+	skin: $.skin, active: true, 
+	contents: [
+		$.content
+	],
+	behavior: Behavior({
+		onTouchEnded: function(container) {
+			if (refilled) {
+				mainContainer.add(new lightbox({content: new lightboxContent({
+					content: new Column({left: 0, right: 0, top: 0, bottom: 0,
+						contents: [
+						new xButton({style: whiteBodyStyle}),
+						new Label({string: "Oops!", style: whiteHeadingStyle, top: 50}),
+						new Text({left: 10, right: 10, string: "Looks like you can't refill at this time. Please contact your doctor if this is a mistake.", style: whiteSmallStyle})]})}),
+					top: 75, left: 50}))
+			} else {
+				mainContainer.add(new refillConfirmation());
+				refilled = true;	
+			}
+		}
+	})
+}));
+
+let xButton = Container.template($ => ({
+	top: 10, right: 10, active: true,
+	contents: 
+		[new Label({string: "x", style: $.style})],
+	Behavior: class extends Behavior {
+		onTouchEnded(button) {
+			mainContainer.remove(mainContainer.last);
+		}
+	}
 }));
 
 
