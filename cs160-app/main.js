@@ -88,7 +88,7 @@ let homeScreen = Column.template($ => ({
 		new button({ name: 'myMedicineButton', top: 120, left: 60, right: 60, bottom: 5,
 			skin: graySkin, 
 				content: new Label({ string: "MY MEDICINE", style: whiteBodyStyle }),
-				onTouchBegan: function(container) {container.skin = whiteSkin},
+				onTouchBegan: function(container) {container.skin = blackBorderedSkin; container.first.style = blackBodyStyle},
 				nextScreen: myMedicineScreen,		
 		}),
 		//Traveling Button not finished yet!
@@ -302,10 +302,15 @@ let mainContainer = new Container({
 	contents: [],
 });
 
+
+
 application.add(mainContainer);
 application.behavior = Behavior({
 	onLaunch: function(application) {
-		currentScreen = new homeScreen();
+		//hard-coded in the notification screen just for the purpose of this assignment - Stacy
+			currentScreen = new Picture({ left: 0, right: 0, height: 568, url: "assets/homescreennotification.png",
+			active: true, 
+			behavior: Behavior({ onTouchEnded(container) {currentScreen = new homeScreen(); mainContainer.add(currentScreen);}}), });
 		mainContainer.add(currentScreen);
 	}	
 });
