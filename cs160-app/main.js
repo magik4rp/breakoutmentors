@@ -48,27 +48,36 @@ let incompletelist = new Column({
 	new Label({ string: incompletepills, style: blackBodyStyle })
 	]
 	});
-let dateBox = new Line({
-	top: 0, left: 0, right: 0, bottom: 0, skin: whiteSkin,
-	contents: [
-	new Label({ left: 50, string: "<", style: blackBodyStyle }),
-	new Column({ top: 50, left: 0, right: 0, bottom: 0, skin: whiteSkin,
-		contents: [
-		new Label({ string: 'Today', style: blackHeadingStyle }),
-		new Label({ string: 'Fri., October 4, 2016', style: blackBodyStyle }),
-		], 
-	}),
-	new Label({ right: 50, string: ">", style: blackBodyStyle }),
-	],
-});
 let homeScreen = Column.template($ => ({
 	top: 0, left: 0, right: 0, bottom: 0, skin: whiteSkin,
 	contents: [
-		dateBox,
+		new Line({
+			top: 0, left: 0, right: 0, bottom: 0, skin: whiteSkin,
+			contents: [
+			new Label({ left: 50, string: "<", style: blackBodyStyle }),
+			new Column({ top: 50, left: 0, right: 0, bottom: 0, skin: whiteSkin,
+				contents: [
+				new Label({ string: 'Today', style: blackHeadingStyle }),
+				new Label({ string: 'Fri., October 4, 2016', style: blackBodyStyle }),
+				], 
+			}),
+			new Label({ right: 50, string: ">", style: blackBodyStyle }),
+			],
+		}),
 		new Label({ name: 'completed', top: 20, string: 'Completed', style: greenBodyStyle }),
-		completedlist,
+		new Column({
+			top: 0, left: 0, right: 0, bottom: 0, skin: whiteSkin,
+			contents: [
+			new Label({ string: completedpills, style: blackBodyStyle })
+			]
+			}),
 		new Label({ name: 'incomplete', string: 'Incomplete', style: redBodyStyle }),
-		incompletelist,
+		new Column({
+			top: 0, left: 0, right: 0, bottom: 0, skin: whiteSkin,
+			contents: [
+			new Label({ string: incompletepills, style: blackBodyStyle })
+			]
+			}),
 		new button({ name: 'myMedicineButton', top: 120, left: 60, right: 60, bottom: 5,
 			skin: graySkin, 
 				content: new Label({ string: "MY MEDICINE", style: whiteBodyStyle }),
@@ -85,7 +94,15 @@ let homeScreen = Column.template($ => ({
 
 //My Medicine Screen
 let myMedicineScreen = Container.template($ => ({
-
+	top: 0, left: 0, right: 0, bottom: 0, skin: whiteSkin,
+	contents: [
+	new button({ name: 'medicine-back-button', top: 5, left: 5, 
+			skin: whiteSkin, 
+			content: new Label({ string: "←", style: blackBodyStyle}),	
+			nextScreen: homeScreen,
+		}),
+	new Label({ string: 'My Medicines', style: blackHeadingStyle }),
+	]
 }));
 
 //Individual Medicine Screen
@@ -106,7 +123,9 @@ let individualMedicineScreen = Column.template($ => ({
 		new button({ name: 'editButton', top: 0, left: 240, right: 0, bottom: 0,
 			skin: whiteSkin, 
 			content: new Picture({ height: 30, url: "assets/editicon.png" }),	
-		}),		pillDetails,		new button({ name: "requestRefillButton", top: 100, left: 60, right: 60, bottom: 20,
+		}),
+		pillDetails,
+		new button({ name: "requestRefillButton", top: 100, left: 60, right: 60, bottom: 20,
 			skin: graySkin,
 			content: new Label({ string: "REQUEST REFILL", style: whiteBodyStyle })
 		}),
@@ -144,8 +163,11 @@ let button = Container.template($ => ({
 		onTouchBegan: $.onTouchBegan,
 		onTouchEnded: function(container) {
 			mainContainer.remove(currentScreen);
-			currentScreen = $.nextScreen;
+			trace('removed current screen \n')
+			currentScreen = new $.nextScreen;
+			trace('set equal to next screen \n')
 			mainContainer.add(currentScreen);
+			trace('added screen \n')
 		}
 	})
 }));
