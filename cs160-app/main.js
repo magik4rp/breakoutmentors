@@ -175,7 +175,16 @@ let individualMedicineScreen = Column.template($ => ({
 			content: new Picture({ height: 15, url: "assets/editicon.png" }),	
 		}),
 		new Label({ string: "Medicine", style: blackHeadingStyle}),
-		pillDetails,
+		new Column({
+			top: 0, left: 0, right: 0, bottom: 0, skin: whiteSkin,
+			contents: [
+			//this is hard-coded for now but we can change this later!
+			new Picture({height: 100, url: "assets/pillphoto.png"}),
+			new Label({ string: "Sertraline", style: blackHeadingStyle}),
+			new Label({ string: "100mg, once daily", style: blackBodyStyle}),
+			new Label({ string: "6% REMAINING", style: redBodyStyle}),
+			], 
+		}),
 		new refillButton({ name: "requestRefillButton", top: 100, left: 60, right: 60, bottom: 20,
 			skin: graySkin,
 			content: new Label({ string: "REQUEST REFILL", style: whiteBodyStyle })
