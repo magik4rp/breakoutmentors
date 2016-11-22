@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 # Group-22-Project
 Group 22 Project
 =======
@@ -37,3 +38,10 @@ to track member hours. There is no legacy code, we are starting from scratch.
 
 
 >>>>>>> 3857943c53e6bcf2f47dc59fcdc8a256853242d8
+=======
+# cs160
+=======
+# Group-22-Project
+Group 22 Project
+>>>>>>> 0643a4be607a2cb4f628156526cf32980c7afead
+>>>>>>> 8ea5416fe00c80faf1db7de4e021c9413c081b5a
